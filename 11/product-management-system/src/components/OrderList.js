@@ -95,9 +95,9 @@ export const OrderList = () => {
     const filtered = filteredOrders;
     setTotalItems(filtered.length);
 
-    // 应用排序
+    // 应用排序 - 默认按日期降序（最新的在前面）
     const sorted = [...filtered].sort((a, b) => {
-      if (sortConfig.key === 'date') {
+      if (sortConfig.key === 'date' || !sortConfig.key) {
         return sortConfig.direction === 'asc' 
           ? new Date(a.date) - new Date(b.date)
           : new Date(b.date) - new Date(a.date);
@@ -302,17 +302,23 @@ export const OrderList = () => {
         <table>
           <thead>
             <tr>
-              <th>日期</th>
+              <th onClick={() => handleSort('date')}>
+                日期 {renderSortIcon('date')}
+              </th>
               <th>规格</th>
               <th>数量</th>
-              <th>总金额</th>
+              <th onClick={() => handleSort('totalAmount')}>
+                总金额 {renderSortIcon('totalAmount')}
+              </th>
               <th>邮费</th>
-              <th>利润</th>
+              <th onClick={() => handleSort('totalProfit')}>
+                利润 {renderSortIcon('totalProfit')}
+              </th>
               <th>操作</th>
             </tr>
           </thead>
           <tbody>
-            {orders.map(renderOrderRow)}
+            {paginatedOrders.map(renderOrderRow)}
           </tbody>
         </table>
 
@@ -323,8 +329,13 @@ export const OrderList = () => {
             <select 
               value={pageSize} 
               onChange={(e) => {
-                setPageSize(Number(e.target.value));
-                setCurrentPage(1);
+                const newPageSize = Number(e.target.value);
+                setPageSize(newPageSize);
+                // 调整当前页码，确保数据连续性
+                const newMaxPage = Math.ceil(totalItems / newPageSize);
+                if (currentPage > newMaxPage) {
+                  setCurrentPage(newMaxPage);
+                }
               }}
             >
               <option value={10}>10</option>
