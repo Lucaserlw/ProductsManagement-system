@@ -777,3 +777,66 @@ button[type="button"]:hover {
   border-radius: 4px;
   margin-bottom: 10px;
 }
+
+/* 数据看板样式 */
+.dashboard {
+  margin-bottom: 30px;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+.stats-card {
+  background: white;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.stats-card h3 {
+  margin: 0 0 15px 0;
+  color: #2c3e50;
+  font-size: 1.2em;
+}
+
+.stats-content {
+  display: grid;
+  gap: 15px;
+}
+
+.stat-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.stat-item .label {
+  color: #666;
+}
+
+.stat-item .value {
+  font-weight: bold;
+  color: #2c3e50;
+}
+
+/* 为不同类型的卡片添加不同的强调色 */
+.stats-card.today {
+  border-left: 4px solid #4CAF50;
+}
+
+.stats-card.month {
+  border-left: 4px solid #2196F3;
+}
+
+.stats-card.total {
+  border-left: 4px solid #9C27B0;
+}
+
+@media (max-width: 768px) {
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+}

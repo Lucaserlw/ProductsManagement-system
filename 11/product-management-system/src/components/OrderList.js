@@ -3,6 +3,7 @@ import { storage } from '../utils/storage';
 import { OrderForm } from './OrderForm';
 import { Statistics } from './Statistics';
 import { DataTransfer } from './DataTransfer';
+import { Dashboard } from './Dashboard';
 
 export const OrderList = () => {
   const [orders, setOrders] = useState([]);
@@ -132,23 +133,67 @@ export const OrderList = () => {
 
   const handleImportOrders = (data) => {
     // 处理导入的订单数据
-    const processedData = data.map(row => ({
-      id: String(Date.now() + Math.random()),
-      date: row['日期'] ? new Date(row['日期']).toISOString() : new Date().toISOString(),
-      isImported: true, // 标记为导入的订单
-      items: [{
-        specs: row['规格'] || '',
-        quantity: Number(row['数量']) || 0,
-        sellingPrice: Number(row['售价']) || 0,
-        isRemoteArea: false
-      }],
-      totalAmount: Number(row['售价']) || 0,
-      totalProfit: Number(row['利润']) || 0,
-      shippingFee: Number(row['邮费']) || 0
-    }));
-    
-    setOrders([...orders, ...processedData]);
-    storage.saveOrders([...orders, ...processedData]);
+    const processedData = data.map(row => {
+      // 如果是已经格式化好的订单对象，直接使用
+      if (row.items && Array.isArray(row.items)) {
+        return {
+          id: String(Date.now() + Math.random()),
+          date: row.date || new Date().toISOString(),
+          items: row.items,
+          totalAmount: row.totalAmount || 0,
+          shippingFee: row.shippingFee || 0,
+          totalProfit: row.totalProfit || 0,
+          isImported: true
+        };
+      }
+
+      // 否则，处理Excel导入的原始数据
+      if (!row['规格']) {
+        console.warn('跳过无效数据行:', row);
+        return null;
+      }
+
+      // 处理日期格式
+      let orderDate;
+      try {
+        orderDate = row['日期'] ? new Date(row['日期']) : new Date();
+        if (isNaN(orderDate.getTime())) {
+          orderDate = new Date();
+        }
+      } catch {
+        orderDate = new Date();
+      }
+
+      return {
+        id: String(Date.now() + Math.random()),
+        date: orderDate.toISOString(),
+        items: [{
+          specs: String(row['规格'] || '').trim(),
+          quantity: Number(row['数量']) || 1,
+          sellingPrice: Number(row['售价']) || 0,
+          isRemoteArea: false
+        }],
+        totalAmount: Number(row['售价']) * (Number(row['数量']) || 1),
+        shippingFee: Number(row['邮费']) || 0,
+        totalProfit: Number(row['利润']) || 0,
+        isImported: true
+      };
+    }).filter(Boolean);
+
+    if (processedData.length === 0) {
+      alert('没有有效的数据可导入！');
+      return;
+    }
+
+    // 使用函数式更新确保状态更新的准确性
+    setOrders(prevOrders => {
+      const newOrders = [...prevOrders, ...processedData];
+      storage.saveOrders(newOrders);
+      return newOrders;
+    });
+
+    // 提示导入成功
+    alert(`成功导入 ${processedData.length} 条订单数据`);
   };
 
   const handleExportOrders = () => {
@@ -156,9 +201,17 @@ export const OrderList = () => {
   };
 
   const handleClearData = () => {
-    if (window.confirm('确定要清空所有订单数据吗？')) {
+    if (window.confirm('确定要清空所有订单数据吗？这个操作不可恢复！')) {
+      // 清空状态
       setOrders([]);
-      storage.saveOrders([]);
+      setCurrentPage(1);
+      setTotalItems(0);
+      
+      // 使用 storage 工具类清空数据
+      storage.clearOrders();
+      
+      // 提示用户
+      alert('订单数据已清空');
     }
   };
 
@@ -225,6 +278,9 @@ export const OrderList = () => {
 
   return (
     <div className="order-list">
+      {/* 数据看板 */}
+      <Dashboard orders={orders} />
+      
       <div className="order-list-header">
         <h2>订单管理</h2>
         <div className="header-actions">

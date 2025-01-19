@@ -21,5 +21,15 @@ export const storage = {
   
   saveOrders: (orders) => {
     localStorage.setItem(ORDERS_KEY, JSON.stringify(orders));
+  },
+
+  clearOrders: () => {
+    localStorage.removeItem('orders');
+    window.dispatchEvent(new Event('ordersCleared'));
+  },
+
+  clearProducts: () => {
+    localStorage.removeItem('products');
+    window.dispatchEvent(new Event('productsCleared'));
   }
 }; 
