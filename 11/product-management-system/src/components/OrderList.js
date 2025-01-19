@@ -141,7 +141,7 @@ export const OrderList = () => {
           date: row.date || new Date().toISOString(),
           items: row.items,
           totalAmount: row.totalAmount || 0,
-          shippingFee: row.shippingFee || 0,
+          shippingFee: Number(row.shippingFee),
           totalProfit: row.totalProfit || 0,
           isImported: true
         };
@@ -174,7 +174,7 @@ export const OrderList = () => {
           isRemoteArea: false
         }],
         totalAmount: Number(row['售价']) * (Number(row['数量']) || 1),
-        shippingFee: Number(row['邮费']) || 0,
+        shippingFee: Number(row['邮费']),
         totalProfit: Number(row['利润']) || 0,
         isImported: true
       };
