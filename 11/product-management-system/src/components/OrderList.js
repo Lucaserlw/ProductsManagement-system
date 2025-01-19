@@ -26,52 +26,25 @@ export const OrderList = () => {
     direction: 'desc'
   });
 
-  // 添加一个函数来更新商品列表
-  const updateProducts = () => {
-    setProducts(storage.getProducts());
-  };
-
   useEffect(() => {
-    // 初始加载数据
-    setOrders(storage.getOrders());
-    updateProducts();
-
-    // 添加事件监听器来监听 localStorage 的变化
-    const handleStorageChange = (e) => {
-      if (e.key === 'products') {
-        updateProducts();
-      }
+    setOrders(storage.getOrders() || []);
+    setProducts(storage.getProducts() || []);
+    
+    // 监听商品数据更新
+    const handleProductsUpdate = () => {
+      setProducts(storage.getProducts() || []);
     };
-
-    window.addEventListener('storage', handleStorageChange);
-
-    // 设置定期检查商品列表更新
-    const intervalId = setInterval(updateProducts, 1000);
-
-    // 清理函数
-    return () => {
-      window.removeEventListener('storage', handleStorageChange);
-      clearInterval(intervalId);
-    };
+    window.addEventListener('productsUpdated', handleProductsUpdate);
+    return () => window.removeEventListener('productsUpdated', handleProductsUpdate);
   }, []);
 
   const handleAddOrder = (order) => {
     const newOrder = {
       ...order,
       id: Date.now().toString(),
-      date: new Date().toISOString(),
-      items: [{
-        specs: order.specs,
-        quantity: Number(order.quantity),
-        sellingPrice: Number(order.price),
-        isRemoteArea: false
-      }],
-      totalAmount: Number(order.price) * Number(order.quantity),
-      totalProfit: Number(order.profit),
-      shippingFee: Number(order.shippingFee)
+      date: new Date(order.date).toISOString()
     };
-    
-    const newOrders = [newOrder, ...orders];
+    const newOrders = [...orders, newOrder];
     setOrders(newOrders);
     storage.saveOrders(newOrders);
     setShowForm(false);
@@ -157,19 +130,25 @@ export const OrderList = () => {
     return sortConfig.direction === 'asc' ? '↑' : '↓';
   };
 
-  // 添加处理函数
   const handleImportOrders = (data) => {
-    // 处理导入的数据
-    const processedData = data.map(order => ({
-      id: order.id || Date.now().toString(),
-      date: order.date || new Date().toISOString(),
-      items: Array.isArray(order.items) ? order.items : [],
-      totalAmount: Number(order.totalAmount) || 0,
-      totalProfit: Number(order.totalProfit) || 0
+    // 处理导入的订单数据
+    const processedData = data.map(row => ({
+      id: String(Date.now() + Math.random()),
+      date: row['日期'] ? new Date(row['日期']).toISOString() : new Date().toISOString(),
+      isImported: true, // 标记为导入的订单
+      items: [{
+        specs: row['规格'] || '',
+        quantity: Number(row['数量']) || 0,
+        sellingPrice: Number(row['售价']) || 0,
+        isRemoteArea: false
+      }],
+      totalAmount: Number(row['售价']) || 0,
+      totalProfit: Number(row['利润']) || 0,
+      shippingFee: Number(row['邮费']) || 0
     }));
-
-    setOrders(processedData);
-    storage.saveOrders(processedData);
+    
+    setOrders([...orders, ...processedData]);
+    storage.saveOrders([...orders, ...processedData]);
   };
 
   const handleExportOrders = () => {
@@ -188,6 +167,60 @@ export const OrderList = () => {
       ...prev,
       [field]: value
     }));
+  };
+
+  const handleDeleteOrder = (orderId) => {
+    if (window.confirm('确定要删除这个订单吗？')) {
+      const newOrders = orders.filter(order => order.id !== orderId);
+      setOrders(newOrders);
+      storage.saveOrders(newOrders);
+    }
+  };
+
+  const renderOrderRow = (order) => {
+    if (order.isImported) {
+      // 渲染导入的订单数据
+      return (
+        <tr key={order.id}>
+          <td>{new Date(order.date).toLocaleDateString('zh-CN')}</td>
+          <td>{order.items[0]?.specs || ''}</td>
+          <td>{order.items[0]?.quantity || 0}</td>
+          <td>¥{(order.totalAmount || 0).toFixed(2)}</td>
+          <td>¥{(order.shippingFee || 0).toFixed(2)}</td>
+          <td>¥{(order.totalProfit || 0).toFixed(2)}</td>
+          <td>
+            <button 
+              onClick={() => handleDeleteOrder(order.id)}
+              className="delete-btn"
+            >
+              删除
+            </button>
+          </td>
+        </tr>
+      );
+    } else {
+      // 渲染手动添加的订单数据
+      const totalQuantity = order.items?.reduce((sum, item) => sum + (Number(item.quantity) || 0), 0) || 0;
+      
+      return (
+        <tr key={order.id}>
+          <td>{new Date(order.date).toLocaleDateString('zh-CN')}</td>
+          <td>{order.items?.map(item => item.specs).join(', ') || ''}</td>
+          <td>{totalQuantity}</td>
+          <td>¥{(order.totalAmount || 0).toFixed(2)}</td>
+          <td>¥{(order.shippingFee || 0).toFixed(2)}</td>
+          <td>¥{(order.totalProfit || 0).toFixed(2)}</td>
+          <td>
+            <button 
+              onClick={() => handleDeleteOrder(order.id)}
+              className="delete-btn"
+            >
+              删除
+            </button>
+          </td>
+        </tr>
+      );
+    }
   };
 
   return (
@@ -269,36 +302,17 @@ export const OrderList = () => {
         <table>
           <thead>
             <tr>
-              <th onClick={() => handleSort('date')} className="sortable">
-                订单时间 {renderSortIcon('date')}
-              </th>
-              <th>商品明细</th>
-              <th onClick={() => handleSort('totalAmount')} className="sortable">
-                订单金额 {renderSortIcon('totalAmount')}
-              </th>
-              <th onClick={() => handleSort('totalProfit')} className="sortable">
-                利润 {renderSortIcon('totalProfit')}
-              </th>
+              <th>日期</th>
+              <th>规格</th>
+              <th>数量</th>
+              <th>总金额</th>
+              <th>邮费</th>
+              <th>利润</th>
+              <th>操作</th>
             </tr>
           </thead>
           <tbody>
-            {paginatedOrders.map(order => (
-              <tr key={order.id}>
-                <td>{new Date(order.date).toLocaleDateString('zh-CN')}</td>
-                <td>
-                  <ul className="order-items-list">
-                    {order.items.map((item, index) => (
-                      <li key={index}>
-                        {item.specs} × {item.quantity}
-                        {item.isRemoteArea && ' (偏远地区)'}
-                      </li>
-                    ))}
-                  </ul>
-                </td>
-                <td>¥{order.totalAmount.toFixed(2)}</td>
-                <td>¥{order.totalProfit.toFixed(2)}</td>
-              </tr>
-            ))}
+            {orders.map(renderOrderRow)}
           </tbody>
         </table>
 
