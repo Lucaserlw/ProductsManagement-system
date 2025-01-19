@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { storage } from '../utils/storage';
 import { ProductForm } from './ProductForm';
+import { DataTransfer } from './DataTransfer';
 
 export const ProductList = () => {
   const [products, setProducts] = useState([]);
@@ -8,11 +9,21 @@ export const ProductList = () => {
   const [showForm, setShowForm] = useState(false);
 
   useEffect(() => {
-    setProducts(storage.getProducts());
+    setProducts(storage.getProducts() || []);
   }, []);
 
   const handleAddProduct = (product) => {
-    const newProducts = [...products, { ...product, id: Date.now().toString() }];
+    const newProduct = {
+      ...product,
+      id: Date.now().toString(),
+      date: new Date().toISOString(),
+      name: product.specs || '',  // 使用规格作为名称
+      cost: Number(product.cost) || 0,
+      promotionFee: Number(product.promotionFee) || 0,
+      description: product.description || '',
+      inventory: Number(product.inventory) || 0
+    };
+    const newProducts = [...products, newProduct];
     setProducts(newProducts);
     storage.saveProducts(newProducts);
     setShowForm(false);
@@ -35,19 +46,57 @@ export const ProductList = () => {
     }
   };
 
+  const handleImportProducts = (data) => {
+    // 确保所有数值字段都有默认值
+    const processedData = data.map(item => ({
+      id: item.id || Date.now().toString(),
+      date: item.date || new Date().toISOString(),
+      name: item.name || '',
+      cost: Number(item.cost) || 0,
+      promotionFee: Number(item.promotionFee) || 0,
+      description: item.description || '',
+      inventory: Number(item.inventory) || 0
+    }));
+    
+    setProducts(processedData);
+    storage.saveProducts(processedData);
+  };
+
+  const handleExportProducts = () => {
+    return products;
+  };
+
+  const handleClearData = () => {
+    if (window.confirm('确定要清空所有商品数据吗？')) {
+      setProducts([]);
+      storage.saveProducts([]);
+    }
+  };
+
   return (
     <div className="product-list">
-      <div className="product-list-header">
-        <h2>商品管理</h2>
+      <div className="header-actions">
         <button 
-          onClick={() => {
-            setShowForm(!showForm);
-            setEditingProduct(null);
-          }}
+          onClick={() => setShowForm(!showForm)}
           className="add-product-btn"
         >
-          {showForm ? '取消' : '+ 添加商品'}
+          {showForm ? '取消' : '+ 新增商品'}
         </button>
+        <DataTransfer
+          onImport={handleImportProducts}
+          onExport={handleExportProducts}
+          type="products"
+        />
+        <button 
+          onClick={handleClearData}
+          className="clear-data-btn"
+        >
+          清空数据
+        </button>
+      </div>
+
+      <div className="product-list-header">
+        <h2>商品管理</h2>
       </div>
 
       {showForm && !editingProduct && (
@@ -78,20 +127,24 @@ export const ProductList = () => {
           <table>
             <thead>
               <tr>
-                <th>商品名称</th>
+                <th>日期</th>
+                <th>规格</th>
                 <th>成本价</th>
-                <th>普通邮费</th>
-                <th>偏远邮费</th>
+                <th>推广费</th>
+                <th>描述</th>
+                <th>库存</th>
                 <th>操作</th>
               </tr>
             </thead>
             <tbody>
               {products.map(product => (
                 <tr key={product.id}>
-                  <td>{product.name}</td>
-                  <td>¥{product.cost}</td>
-                  <td>¥{product.shippingFeeNormal}</td>
-                  <td>¥{product.shippingFeeRemote}</td>
+                  <td>{new Date(product.date).toLocaleDateString('zh-CN')}</td>
+                  <td>{product.name || ''}</td>
+                  <td>¥{(product.cost || 0).toFixed(2)}</td>
+                  <td>¥{(product.promotionFee || 0).toFixed(2)}</td>
+                  <td>{product.description || ''}</td>
+                  <td>{product.inventory || 0}</td>
                   <td>
                     <button 
                       onClick={() => {

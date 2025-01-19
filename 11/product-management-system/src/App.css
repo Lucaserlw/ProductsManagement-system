@@ -15,10 +15,17 @@
 }
 
 .App-header {
-  background-color: #282c34;
-  padding: 20px;
+  background-color: #2c3e50;
+  padding: 15px 0;
   color: white;
-  margin-bottom: 20px;
+  margin-bottom: 30px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.App-header h1 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 500;
 }
 
 .App-link {
@@ -35,10 +42,9 @@
 }
 
 main {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
-  padding: 20px;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 20px;
 }
 
 @media (max-width: 768px) {
@@ -125,10 +131,10 @@ button[type="button"]:hover {
 }
 
 .order-list {
-  padding: 20px;
   background: white;
   border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  padding: 25px;
 }
 
 .order-form {
@@ -247,27 +253,33 @@ button[type="button"]:hover {
 
 /* 表格样式优化 */
 .orders-table {
-  margin-top: 30px;
-  background: white;
+  margin-top: 25px;
+  border: 1px solid #e9ecef;
   border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
   overflow: hidden;
 }
 
 .orders-table table {
-  margin-bottom: 0;
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
 }
 
 .orders-table th {
-  background-color: #f1f3f5;
-  color: #495057;
+  background-color: #f8f9fa;
+  padding: 12px 16px;
   font-weight: 600;
-  text-transform: uppercase;
-  font-size: 0.9em;
+  color: #495057;
+  border-bottom: 2px solid #e9ecef;
 }
 
 .orders-table td {
-  vertical-align: middle;
+  padding: 12px 16px;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.orders-table tr:last-child td {
+  border-bottom: none;
 }
 
 .order-items-list li {
@@ -347,11 +359,18 @@ button[type="button"]:hover {
 }
 
 .delete-btn {
-  background-color: #fa5252;
+  padding: 6px 12px;
+  font-size: 0.875rem;
+  background-color: #ff6b6b;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
 }
 
 .delete-btn:hover {
-  background-color: #e03131;
+  background-color: #fa5252;
 }
 
 .cancel-edit-btn {
@@ -455,4 +474,257 @@ button[type="button"]:hover {
   .stats-grid {
     grid-template-columns: 1fr;
   }
+}
+
+/* 订单管理区域样式优化 */
+.order-list {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  padding: 25px;
+}
+
+/* 标题和操作按钮区域 */
+.order-list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid #f1f3f5;
+}
+
+.order-list-header h2 {
+  margin: 0;
+  font-size: 1.25rem;
+  color: #343a40;
+}
+
+/* 按钮容器样式 */
+.header-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+/* 统一按钮基础样式 */
+.header-actions button,
+.header-actions .import-btn,
+.header-actions .export-btn {
+  height: 36px;
+  width: 120px;  /* 统一宽度 */
+  padding: 0;    /* 移除内边距 */
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  color: white;
+  display: flex;     /* 使用flex布局 */
+  align-items: center;
+  justify-content: center;
+}
+
+/* 新增订单按钮 */
+.add-order-btn {
+  background-color: #40c057;
+}
+
+/* 导入导出按钮容器 */
+.data-transfer {
+  display: flex;
+  gap: 12px;  /* 与其他按钮保持相同间距 */
+}
+
+/* 导入导出按钮 */
+.import-btn,
+.export-btn {
+  background-color: #228be6;
+  display: inline-block;  /* 改为行内块元素 */
+  text-align: center;     /* 文字居中 */
+}
+
+/* 隐藏文件输入框但保持可访问性 */
+.file-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}
+
+/* 按钮内的图标样式 */
+.header-actions button i,
+.header-actions label i {
+  margin-right: 6px;
+  font-size: 16px;
+}
+
+/* 禁用状态样式 */
+.header-actions button:disabled,
+.header-actions label.disabled {
+  background-color: #dee2e6;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+/* 筛选器样式优化 */
+.filters {
+  background: #f8f9fa;
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 25px;
+}
+
+.filter-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.filter-group label {
+  color: #495057;
+  font-weight: 500;
+  min-width: 80px;
+}
+
+.filter-group input {
+  padding: 8px 12px;
+  border: 1px solid #dee2e6;
+  border-radius: 6px;
+  transition: border-color 0.2s;
+}
+
+.filter-group input:focus {
+  outline: none;
+  border-color: #4CAF50;
+}
+
+/* 表格样式优化 */
+.orders-table {
+  margin-top: 25px;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.orders-table table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.orders-table th {
+  background-color: #f8f9fa;
+  padding: 12px 16px;
+  font-weight: 600;
+  color: #495057;
+  border-bottom: 2px solid #e9ecef;
+}
+
+.orders-table td {
+  padding: 12px 16px;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.orders-table tr:last-child td {
+  border-bottom: none;
+}
+
+/* 删除按钮样式优化 */
+.delete-btn {
+  padding: 6px 12px;
+  font-size: 0.875rem;
+  background-color: #ff6b6b;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.delete-btn:hover {
+  background-color: #fa5252;
+}
+
+/* 排序相关样式 */
+.sortable {
+  cursor: pointer;
+  user-select: none;
+  position: relative;
+}
+
+.sortable:hover {
+  background-color: #f1f3f5;
+}
+
+/* 分页相关样式 */
+.pagination {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  background: #f8f9fa;
+  border-top: 1px solid #e9ecef;
+  margin-top: -1px;
+  border-radius: 0 0 8px 8px;
+}
+
+.page-size {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.page-size select {
+  padding: 4px 8px;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  background: white;
+}
+
+.page-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.page-controls button {
+  padding: 4px 12px;
+  background: white;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  color: #495057;
+  cursor: pointer;
+}
+
+.page-controls button:hover:not(:disabled) {
+  background: #e9ecef;
+}
+
+.page-controls button:disabled {
+  background: #f8f9fa;
+  color: #adb5bd;
+  cursor: not-allowed;
+}
+
+.page-info {
+  margin: 0 12px;
+  color: #495057;
+}
+
+/* 表格优化 */
+.orders-table tbody tr:hover {
+  background-color: #f8f9fa;
+}
+
+.orders-table th {
+  position: sticky;
+  top: 0;
+  background-color: #f8f9fa;
+  z-index: 1;
 }

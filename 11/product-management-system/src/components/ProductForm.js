@@ -1,39 +1,36 @@
 import React, { useState } from 'react';
 
-export const ProductForm = ({ onSubmit, initialData = null }) => {
+export const ProductForm = ({ onSubmit, initialData }) => {
   const [formData, setFormData] = useState(initialData || {
     name: '',
     cost: '',
-    shippingFeeNormal: '',
-    shippingFeeRemote: ''
+    promotionFee: '',
+    description: '',
+    inventory: ''
   });
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSubmit({
-      ...formData,
-      cost: Number(formData.cost),
-      shippingFeeNormal: Number(formData.shippingFeeNormal),
-      shippingFeeRemote: Number(formData.shippingFeeRemote)
-    });
-    if (!initialData) {
-      setFormData({
-        name: '',
-        cost: '',
-        shippingFeeNormal: '',
-        shippingFeeRemote: ''
-      });
-    }
+    onSubmit(formData);
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
   };
 
   return (
-    <form onSubmit={handleSubmit} className="product-form">
+    <form onSubmit={handleSubmit}>
       <div className="form-group">
-        <label>商品名称：</label>
+        <label>规格：</label>
         <input
           type="text"
+          name="name"
           value={formData.name}
-          onChange={(e) => setFormData({...formData, name: e.target.value})}
+          onChange={handleChange}
           required
         />
       </div>
@@ -41,36 +38,44 @@ export const ProductForm = ({ onSubmit, initialData = null }) => {
         <label>成本价：</label>
         <input
           type="number"
+          name="cost"
           value={formData.cost}
-          onChange={(e) => setFormData({...formData, cost: e.target.value})}
-          required
-          min="0"
+          onChange={handleChange}
           step="0.01"
+          required
         />
       </div>
       <div className="form-group">
-        <label>普通邮费：</label>
+        <label>推广费：</label>
         <input
           type="number"
-          value={formData.shippingFeeNormal}
-          onChange={(e) => setFormData({...formData, shippingFeeNormal: e.target.value})}
-          required
-          min="0"
+          name="promotionFee"
+          value={formData.promotionFee}
+          onChange={handleChange}
           step="0.01"
+          required
         />
       </div>
       <div className="form-group">
-        <label>偏远邮费：</label>
+        <label>描述：</label>
         <input
-          type="number"
-          value={formData.shippingFeeRemote}
-          onChange={(e) => setFormData({...formData, shippingFeeRemote: e.target.value})}
-          required
-          min="0"
-          step="0.01"
+          type="text"
+          name="description"
+          value={formData.description}
+          onChange={handleChange}
         />
       </div>
-      <button type="submit">{initialData ? '保存修改' : '添加商品'}</button>
+      <div className="form-group">
+        <label>库存：</label>
+        <input
+          type="number"
+          name="inventory"
+          value={formData.inventory}
+          onChange={handleChange}
+          required
+        />
+      </div>
+      <button type="submit">保存</button>
     </form>
   );
 }; 

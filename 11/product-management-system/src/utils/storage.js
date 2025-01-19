@@ -4,11 +4,12 @@ const ORDERS_KEY = 'orders';
 export const storage = {
   // 商品相关
   getProducts: () => {
-    return JSON.parse(localStorage.getItem(PRODUCTS_KEY) || '[]');
+    const products = localStorage.getItem('products');
+    return products ? JSON.parse(products) : [];
   },
   
   saveProducts: (products) => {
-    localStorage.setItem(PRODUCTS_KEY, JSON.stringify(products));
+    localStorage.setItem('products', JSON.stringify(products));
     // 触发一个自定义事件来通知其他组件
     window.dispatchEvent(new Event('productsUpdated'));
   },
