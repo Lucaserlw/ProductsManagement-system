@@ -294,3 +294,165 @@ button[type="button"]:hover {
     width: 100%;
   }
 }
+
+.product-list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.add-product-btn {
+  background-color: #228be6;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.add-product-btn:hover {
+  background-color: #1c7ed6;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  margin: 20px 0;
+}
+
+.empty-state p {
+  color: #868e96;
+  margin-bottom: 20px;
+}
+
+.product-form-container {
+  background: #f8f9fa;
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.edit-btn {
+  background-color: #228be6;
+  margin-right: 8px;
+}
+
+.edit-btn:hover {
+  background-color: #1c7ed6;
+}
+
+.delete-btn {
+  background-color: #fa5252;
+}
+
+.delete-btn:hover {
+  background-color: #e03131;
+}
+
+.cancel-edit-btn {
+  background-color: #868e96;
+  margin-top: 10px;
+}
+
+.cancel-edit-btn:hover {
+  background-color: #495057;
+}
+
+/* 统计样式 */
+.statistics {
+  margin-bottom: 30px;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.stats-card {
+  background: white;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.stats-card h3 {
+  margin: 0 0 15px 0;
+  color: #495057;
+  font-size: 1.1em;
+}
+
+.stats-content {
+  display: grid;
+  gap: 15px;
+}
+
+.stat-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.stat-item .label {
+  color: #868e96;
+}
+
+.stat-item .value {
+  font-size: 1.2em;
+  font-weight: 600;
+}
+
+.today .value {
+  color: #2b8a3e;
+}
+
+.month .value {
+  color: #1864ab;
+}
+
+.total .value {
+  color: #495057;
+}
+
+.top-products {
+  background: white;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.top-products h3 {
+  margin: 0 0 15px 0;
+  color: #495057;
+}
+
+.top-products table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.top-products th,
+.top-products td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.top-products th {
+  background-color: #f8f9fa;
+  font-weight: 600;
+  color: #495057;
+}
+
+/* 响应式调整 */
+@media (max-width: 768px) {
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+}
